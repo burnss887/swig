@@ -492,11 +492,14 @@ public:
       if (imclass_imports)
 	Printf(f_im, "%s\n", imclass_imports);
 
-      if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+      if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
         String* doxygen_comments = doxygenTranslator->getDocumentation(n, 0);
-        if (comment_creation_chatter)
-          Printf(f_im, "/* This was generated from top() */");
-        Printv(f_im, " /** ", Char(doxygen_comments), " */\n", NIL);
+        if (Len(doxygen_comments) > 0)
+        {
+          if (comment_creation_chatter)
+            Printf(f_im, "/* This was generated from top() */");
+          Printv(f_im, " /** ", Char(doxygen_comments), " */\n", NIL);
+        }
         Delete(doxygen_comments);
       }
 
@@ -1245,12 +1248,14 @@ public:
       EnumFeature enum_feature = decodeEnumFeature(n);
       String *typemap_lookup_type = Getattr(n, "name");
 
-      if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+      if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
         String* doxygen_comments = doxygenTranslator->getDocumentation(n, 0);
-        if (comment_creation_chatter) {
-          Printf(enum_code, "/* This was generated from enumDeclaration() */");
+        if (Len(doxygen_comments) > 0) {
+          if (comment_creation_chatter) {
+            Printf(enum_code, "/* This was generated from enumDeclaration() */");
+          }
+          Printv(enum_code, "/** ", Char(doxygen_comments), " */\n", NIL);
         }
-        Printv(enum_code, "/** ", Char(doxygen_comments), " */\n", NIL);
         Delete(doxygen_comments);
       }
 
@@ -1281,12 +1286,14 @@ public:
 	  Printf(constants_code, "  // %s \n", symname);
   
   // Translate and write comment for the enum itself
-  if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+  if (doxygen /* && doxygenTranslator->hasDocumentation(n)*/) {
     String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-    if (comment_creation_chatter)
-      Printf(constants_code, "/* This was generated from enumDeclaration() */\n");
-    Printf(constants_code, Char(doxygen_comments));
-    Printf(constants_code, "\n");
+    if (Len(doxygen_comments) > 0) {
+      if (comment_creation_chatter)
+        Printf(constants_code, "/* This was generated from enumDeclaration() */\n");
+      Printf(constants_code, Char(doxygen_comments));
+      Printf(constants_code, "\n");
+    }
     Delete(doxygen_comments);
   }
       }
@@ -1430,11 +1437,13 @@ public:
 	if (!GetFlag(n, "firstenumitem"))
 	  Printf(enum_code, ",\n");
 
-	if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+	if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
 	  String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-	  if (comment_creation_chatter)
-	    Printf(enum_code, "/* This was generated from enumvalueDeclaration() */");
-	  Printv(enum_code, "\n /** ", Char(doxygen_comments), " */\n", NIL);
+    if (Len(doxygen_comments) > 0) {
+      if (comment_creation_chatter)
+        Printf(enum_code, "/* This was generated from enumvalueDeclaration() */");
+      Printv(enum_code, "\n /** ", Char(doxygen_comments), " */\n", NIL);
+    }
 	  Delete(doxygen_comments);
 	}
 
@@ -1452,11 +1461,13 @@ public:
 	  Printf(enum_code, " = %s", value);
 	}
       } else {
-        if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+        if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
           String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-          if (comment_creation_chatter)
-            Printf(enum_code, "/* This was generated from enumvalueDeclaration() */");
-          Printv(enum_code, "\n /** ", Char(doxygen_comments), " */\n", NIL);
+          if (Len(doxygen_comments) > 0) {
+            if (comment_creation_chatter)
+              Printf(enum_code, "/* This was generated from enumvalueDeclaration() */");
+            Printv(enum_code, "\n /** ", Char(doxygen_comments), " */\n", NIL);
+          }
           Delete(doxygen_comments);
         }
 
@@ -1519,11 +1530,14 @@ public:
  * file
  * ------------------------------------------------------------------------ */
   virtual int doxygenComment(Node* n) {
-    if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+    if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
       String* doxygen_comments = doxygenTranslator->getDocumentation(n, 0);
-      if (comment_creation_chatter)
-        Printf(structuralComments, "/* This was generated from doxygenComment() */");
+      if (Len(doxygen_comments) > 0)
+      {
+        if (comment_creation_chatter)
+          Printf(structuralComments, "/* This was generated from doxygenComment() */");
       Printv(structuralComments, "/** ", Char(doxygen_comments), " */\n", NIL);
+      }
       Delete(doxygen_comments);
     }
     return SWIG_OK;
@@ -1551,11 +1565,14 @@ public:
     Swig_save("constantWrapper", n, "value", NIL);
     Swig_save("constantWrapper", n, "tmap:ctype:out", "tmap:imtype:out", "tmap:cstype:out", "tmap:out:null", "tmap:imtype:outattributes", "tmap:cstype:outattributes", NIL);
 
-    if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+    if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
       String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-      if (comment_creation_chatter)
-        Printf(constants_code, "/* This was generated from constantWrapper() */");
-      Printv(constants_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+      if (Len(doxygen_comments) > 0)
+      {
+        if (comment_creation_chatter)
+          Printf(constants_code, "/* This was generated from constantWrapper() */");
+        Printv(constants_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+      }
       Delete(doxygen_comments);
     }
 
@@ -1964,11 +1981,14 @@ public:
       Printv(proxy_class_def, typemapLookup(n, "csimports", typemap_lookup_type, WARN_NONE),	// Import statements
 	   "\n", NIL);
 
-    if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+    if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
       String* doxygen_comments = doxygenTranslator->getDocumentation(n, 0);
-      if (comment_creation_chatter)
-        Printf(proxy_class_def, "/* This was generated from emitProxyClassDefAndCPPCasts() */");
-      Printv(proxy_class_def, " /** ", Char(doxygen_comments), " */\n", NIL);
+      if (Len(doxygen_comments) > 0)
+      {
+        if (comment_creation_chatter)
+          Printf(proxy_class_def, "/* This was generated from emitProxyClassDefAndCPPCasts() */");
+        Printv(proxy_class_def, " /** ", Char(doxygen_comments), " */\n", NIL);
+      }
       Delete(doxygen_comments);
     }
 
@@ -2480,11 +2500,14 @@ public:
       Swig_warning(WARN_CSHARP_TYPEMAP_CSWTYPE_UNDEF, input_file, line_number, "No cstype typemap defined for %s\n", SwigType_str(t, 0));
     }
 
-    if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+    if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
       String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-      if (comment_creation_chatter)
-	Printf(function_code, "/* This was generated from proxyclassfunctionhandler() */");
-      Printv(function_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+      if (Len(doxygen_comments) > 0)
+      {
+        if (comment_creation_chatter)
+          Printf(function_code, "/* This was generated from proxyclassfunctionhandler() */");
+        Printv(function_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+      }
       Delete(doxygen_comments);
     }
 
@@ -2722,11 +2745,14 @@ public:
 	  }
 	}
 
-        if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+        if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
 	  String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-	  if (comment_creation_chatter)
-	    Printf(proxy_class_code, "/* This was generated from proxyclassfunctionhandler() */");
-	  Printv(proxy_class_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+    if (Len(doxygen_comments) > 0)
+    {
+      if (comment_creation_chatter)
+        Printf(proxy_class_code, "/* This was generated from proxyclassfunctionhandler() */");
+      Printv(proxy_class_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+    }
 	  Delete(doxygen_comments);
 	}
 
@@ -2813,11 +2839,14 @@ public:
       String *mangled_overname = Swig_name_construct(getNSpace(), overloaded_name);
       String *imcall = NewString("");
 
-      if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+      if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
         String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-        if (comment_creation_chatter)
-          Printf(function_code, "/* This was generated from constructionhandler() */");
-        Printv(function_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+        if (Len(doxygen_comments) > 0)
+        {
+          if (comment_creation_chatter)
+            Printf(function_code, "/* This was generated from constructionhandler() */");
+          Printv(function_code, " /** ", Char(doxygen_comments), " */\n", NIL);
+        }
         Delete(doxygen_comments);
       }
 
@@ -3124,11 +3153,14 @@ public:
     String *post_code = NewString("");
     String *terminator_code = NewString("");
 
-    if (doxygen && doxygenTranslator->hasDocumentation(n)) {
+    if (doxygen /*&& doxygenTranslator->hasDocumentation(n)*/) {
       String* doxygen_comments = doxygenTranslator->getDocumentation(n, "  ");
-      if (comment_creation_chatter)
-        Printf(function_code, "/* This was generated from moduleClassFunctionHandler() */");
-      Printv(function_code, " /** ", doxygen_comments, " */\n", NIL);
+      if (Len(doxygen_comments) > 0)
+      {
+        if (comment_creation_chatter)
+          Printf(function_code, "/* This was generated from moduleClassFunctionHandler() */");
+        Printv(function_code, " /** ", doxygen_comments, " */\n", NIL);
+      }
       Delete(doxygen_comments);
     }
 
